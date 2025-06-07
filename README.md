@@ -9,6 +9,9 @@ This project is the backend for **Pixcrate**, an application focused on image ma
 - [Key Software Concepts and Technologies](#key-software-concepts-and-technologies)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
+- [Connect](#connect)
+- [Who am I?](#who-am-i)
+- [Keywords](#keywords)
 
 ## Key Software Concepts and Technologies
 
@@ -53,8 +56,16 @@ This project is the backend for **Pixcrate**, an application focused on image ma
 	npm start
 	```
 
-## Relevant Tags for SEO and LinkedIn
+## Connect
 
-These tags help improve the discoverability of this project on LinkedIn and search engines:
+👉 **[Connect with the author on LinkedIn!](https://www.linkedin.com/in/angellopezmolina/)** 👈
+
+### Who am I?
+
+I am a Software Developer based in Málaga, with experience in multiple programming languages and technologies. I am passionate about creating robust software and scalable solutions, always with a self-taught and scientific mindset. My approach is practical, focusing on the choice of technologies and the design of efficient solutions, with knowledge of basic architecture and participation in technical decisions aimed at solving real-world problems.
+
+You can find more about my professional background, projects, and contributions on my [LinkedIn profile](https://www.linkedin.com/in/angellopezmolina/).
+
+## Keywords
 
 `typescript`, `javascript`, `nodejs`, `express`, `mongodb`, `aws-s3`, `rest-api`, `aop`, `jwt`, `bcrypt`, `image-management`, `backend`, `cloud-storage`, `api-development`, `software-architecture`, `modular-design`, `mocha`, `nyc`, `nodemon`, `ts-node-dev`, `vocational-education`, `higher-education`, `final-project`, `spanish-education`, `web-development`, `serverless`, `cloud-computing`, `security`, `authentication`, `authorization`, `decorators`, `oop`, `programming`, `open-source`, `project-management`, `devops`, `testing`, `code-coverage`, `scalable`, `maintainable`, `modern-stack`, `s3-bucket`, `expressjs`, `typescript-backend`, `api-security`, `education-project`, `portfolio`, `professional-development`
