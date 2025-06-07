@@ -1,0 +1,13 @@
+{
+    "app": "snap",
+    "server_route" : "http://localhost",
+    "default_port": 80,
+    "database_route": "mongodb://<usuario>:<password>@<host>:<puerto>/<database>",
+    "database_port": 27017,
+    "database_name": "mydb",
+    "controllers_path": "/controllers",
+    "s3_bucket": "<bucket_name>",
+    "s3_region": "<region>",
+    "s3_access": "<access_key>",
+    "s3_secret": "<secret_key>"
+}
