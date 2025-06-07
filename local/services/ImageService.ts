@@ -7,7 +7,15 @@ import { BucketManager } from "../helpers/BucketManager";
 import TokenManager from "../helpers/TokenManager";
 import config from "../../config.json";
 import { handledSend } from "../helpers/Tools";
+import { Schema, Model, DefaultSchemaOptions, Document, FlatRecord } from "mongoose";
 
+// ImageService provides business logic for image-related operations such as upload, retrieval, update, and deletion.
+// It is used by ImageController to handle requests and responses for /image endpoints.
+
+/**
+ * ImageService contains static methods for image management operations.
+ * Use these methods in controllers to implement business logic for image endpoints.
+ */
 export class ImageService {
 
     private static requestBody: any;
@@ -17,6 +25,15 @@ export class ImageService {
 
     private constructor() { }
 
+    /**
+     * Uploads a new image.
+     * 1. Authenticates the user using the provided token.
+     * 2. Creates a new image record in the database.
+     * 3. Uploads the image file to the storage bucket.
+     * 4. Updates the image record with the file URL.
+     * 
+     * @returns The response containing the status and data of the upload operation.
+     */
     public static async upload() {
         let response: any, responseAux: any;
         let databaseManager: DatabaseManager;
@@ -48,7 +65,12 @@ export class ImageService {
                 body: {
                     u_id: response.u_id,
                     description: description,
-                    visibility: visibility
+                    visibility: visibility,
+                    url: "",
+                    getSchemaDefinition: function (): Schema<any, Model<any, any, any, any, any, any>, {}, {}, {}, {}, DefaultSchemaOptions, { [x: string]: unknown; }, Document<unknown, {}, FlatRecord<{ [x: string]: unknown; }>, {}> & FlatRecord<{ [x: string]: unknown; }> & Required<{ _id: unknown; }> & { __v: number; }> {
+                        throw new Error("Function not implemented.");
+                    },
+                    status: 0
                 },
                 returnResult: true
             });
@@ -61,9 +83,16 @@ export class ImageService {
                     url: response.u_id + "/" + this.cfg.app + "/" + visibility + "/" + responseAux._id + ".jpg",
                     onSuccess: async (url: string) => {
 
-                        let image = {
-                            url: `https://${this.cfg.s3_bucket}.s3.${this.cfg.s3_region}.amazonaws.com/` + url
-                        }
+                        const image: ImageSchema = {
+                            url: `https://${this.cfg.s3_bucket}.s3.${this.cfg.s3_region}.amazonaws.com/` + url,
+                            u_id: 'user123',
+                            description: 'Descripción de la imagen',
+                            visibility: 'public', // o 'private'
+                            getSchemaDefinition: function (): Schema<any, Model<any, any, any, any, any, any>, {}, {}, {}, {}, DefaultSchemaOptions, { [x: string]: unknown; }, Document<unknown, {}, FlatRecord<{ [x: string]: unknown; }>, {}> & FlatRecord<{ [x: string]: unknown; }> & Required<{ _id: unknown; }> & { __v: number; }> {
+                                throw new Error("Function not implemented.");
+                            },
+                            status: 0
+                        };
 
                         await this.imageDAO.saveOrUpdate({
                             body: image,
@@ -84,6 +113,13 @@ export class ImageService {
         return response;
     }
 
+    /**
+     * Retrieves all images for the authenticated user.
+     * 1. Authenticates the user using the provided token.
+     * 2. Fetches all image records from the database for the user.
+     * 
+     * @returns An array of image objects containing id, description, visibility, and URL.
+     */
     public static async getAllImages() {
         let response: any, responseAux: any;
         let databaseManager: DatabaseManager;
@@ -126,6 +162,13 @@ export class ImageService {
         return response;
     }
 
+    /**
+     * Retrieves all public images.
+     * 1. Authenticates the user using the provided token.
+     * 2. Fetches all public image records from the database.
+     * 
+     * @returns An array of public image objects containing id, description, visibility, and URL.
+     */
     public static async getAllPublicImages() {
         let response: any, responseAux: any;
         let databaseManager: DatabaseManager;
@@ -168,6 +211,15 @@ export class ImageService {
         return response;
     }
 
+    /**
+     * Deletes an image.
+     * 1. Authenticates the user using the provided token.
+     * 2. Retrieves the image record by ID.
+     * 3. Deletes the image file from the storage bucket.
+     * 4. Removes the image record from the database.
+     * 
+     * @returns The response containing the status and data of the delete operation.
+     */
     public static async deleteImage() {
         let response: any, responseAux: any;
         let databaseManager: DatabaseManager;
@@ -215,6 +267,13 @@ export class ImageService {
         return response;
     }
 
+    /**
+     * Updates an existing image's details.
+     * 1. Authenticates the user using the provided token.
+     * 2. Updates the image record in the database with the provided details.
+     * 
+     * @returns The response containing the status and data of the update operation.
+     */
     public static async updateImage() {
         let response: any, responseAux: any;
         let databaseManager: DatabaseManager;
@@ -239,7 +298,13 @@ export class ImageService {
             response = await this.imageDAO.saveOrUpdate({
                 body: {
                     description: AbstractController.metadata("request").body.description,
-                    visibility: AbstractController.metadata("request").body.visibility
+                    visibility: AbstractController.metadata("request").body.visibility,
+                    u_id: "",
+                    url: "",
+                    getSchemaDefinition: function (): Schema<any, Model<any, any, any, any, any, any>, {}, {}, {}, {}, DefaultSchemaOptions, { [x: string]: unknown; }, Document<unknown, {}, FlatRecord<{ [x: string]: unknown; }>, {}> & FlatRecord<{ [x: string]: unknown; }> & Required<{ _id: unknown; }> & { __v: number; }> {
+                        throw new Error("Function not implemented.");
+                    },
+                    status: 0
                 },
                 id: AbstractController.metadata("urlParams").id
             });

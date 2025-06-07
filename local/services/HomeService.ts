@@ -5,10 +5,18 @@ import TokenManager from "../helpers/TokenManager";
 import { hash, checkHash } from "../helpers/Tools";
 import { AbstractController } from "../controllers/AbstractController";
 import { AuthBundleSchema } from "../schemas/AuthBundleSchema";
-import { v4 as pipRetrieverV4 } from "public-ip";
+import publicIp from "public-ip";
 import { BucketManager } from "../helpers/BucketManager";
 import config from "../../config.json";
+import { Schema, Model, DefaultSchemaOptions, Document, FlatRecord } from "mongoose";
 
+// HomeService provides business logic for home-related operations such as authentication and registration.
+// It is used by HomeController to handle requests and responses for /home endpoints.
+
+/**
+ * HomeService contains static methods for user authentication, registration, and session management.
+ * Use these methods in controllers to implement business logic for home endpoints.
+ */
 export default class HomeService {
 
     private static requestBody: any;
@@ -18,6 +26,10 @@ export default class HomeService {
 
     private constructor() { }
 
+    /**
+     * Authenticates a user and retrieves an access token.
+     * @returns An object containing the access token and status.
+     */
     public static async getAccessToken() {
         let response: any;
         let access_token, ref_token: string;
@@ -83,25 +95,47 @@ export default class HomeService {
                 await this.authBundleDAO.saveOrUpdate({
                     body: {
                         ref_token: ref_token,
-                        public_ip: await pipRetrieverV4()
+                        public_ip: await publicIp.publicIp(),
+                        u_id: response._id,
+                        getSchemaDefinition: function (): Schema<any, Model<any, any, any, any, any, any>, {}, {}, {}, {}, DefaultSchemaOptions, { [x: string]: unknown; }, Document<unknown, {}, FlatRecord<{ [x: string]: unknown; }>, {}> & FlatRecord<{ [x: string]: unknown; }> & Required<{ _id: unknown; }> & { __v: number; }> {
+                            throw new Error("Function not implemented.");
+                        },
+                        status: 0
                     },
-                    id: aux._id
+                    id: aux.u_id // Cambiado de aux._id a aux.u_id para coincidir con el esquema
                 });
             } else { //IF NOT, CREATE A NEW ONE
-                
                 await this.authBundleDAO.saveOrUpdate({
                     body: {
                         ref_token: ref_token,
                         u_id: response._id,
-                        public_ip: await pipRetrieverV4()
+                        public_ip: await publicIp.publicIp(),
+                        getSchemaDefinition: function (): Schema<any, Model<any, any, any, any, any, any>, {}, {}, {}, {}, DefaultSchemaOptions, { [x: string]: unknown; }, Document<unknown, {}, FlatRecord<{ [x: string]: unknown; }>, {}> & FlatRecord<{ [x: string]: unknown; }> & Required<{ _id: unknown; }> & { __v: number; }> {
+                            throw new Error("Function not implemented.");
+                        },
+                        status: 0
                     }
                 });
-                
             }
 
             await this.userDAO.saveOrUpdate({
                 body: {
-                    access_token: access_token
+                    access_token: access_token,
+                    email: "",
+                    username: "",
+                    password: "",
+                    name: "",
+                    surname: "",
+                    age: 0,
+                    confirmed: false,
+                    getSchemaDefinition: function (): Schema<any, Model<any, any, any, any, any, any>, {}, {}, {}, {}, DefaultSchemaOptions, { [x: string]: unknown; }, Document<unknown, {}, FlatRecord<{ [x: string]: unknown; }>, {}> & FlatRecord<{ [x: string]: unknown; }> & Required<{ _id: unknown; }> & { __v: number; }> {
+                        throw new Error("Function not implemented.");
+                    },
+                    u_id: "",
+                    ref_token: "",
+                    created_at: undefined,
+                    updated_at: undefined,
+                    status: 0
                 },
                 id: response._id
             });
@@ -121,6 +155,10 @@ export default class HomeService {
 
         return response;
     }
+    /**
+     * Registers a new user in the system.
+     * @returns An object containing the status of the registration.
+     */
     public static async registerUser() {
         let response: any;
         let databaseManager: DatabaseManager;
@@ -171,6 +209,10 @@ export default class HomeService {
 
         return response;
     }
+    /**
+     * Destroys the user session, logging the user out.
+     * @returns A message indicating the result of the logout operation.
+     */
     public static async destroySession() {
         let response: any;
         let databaseManager: DatabaseManager;

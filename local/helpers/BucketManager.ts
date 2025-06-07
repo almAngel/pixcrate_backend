@@ -1,13 +1,27 @@
+// BucketManager is a helper class for managing AWS S3 buckets and objects (folders/files).
+// It provides methods to create folders, upload files, and delete files in an S3 bucket using the AWS SDK.
+// The configuration is loaded from config.json and credentials are set up in the constructor.
+
 import aws, { S3 } from "aws-sdk";
 import config from "../../config.json";
 import { readFileSync } from "fs";
 import { handledSend } from "./Tools.js";
-import { isBuffer } from "util";
 
+/**
+ * BucketManager handles AWS S3 operations such as creating folders, uploading, and deleting files.
+ *
+ * Usage:
+ *   const manager = new BucketManager();
+ *   manager.uploadFile({ ... });
+ *   manager.deleteFile({ ... });
+ */
 export class BucketManager {
     private instance: aws.S3;
     private static readonly cfg = config;
 
+    /**
+     * Initializes the S3 instance and sets credentials/region from config.json.
+     */
     constructor() {
         this.instance = new aws.S3({});
 
@@ -20,6 +34,11 @@ export class BucketManager {
 
     }
 
+    /**
+     * Creates a folder in the S3 bucket at the specified path (optionally with context).
+     * @param folderPath - The base path for the folder.
+     * @param context - Optional subfolder or context to append.
+     */
     public async createFolder({ folderPath, context }: { folderPath: string; context?: string }) {
         let response: any;
         let finalPath: string;
@@ -50,7 +69,14 @@ export class BucketManager {
             });
     }
 
-    //PENDIENTE DE CONFIRMACION
+    /**
+     * Uploads a file to the S3 bucket.
+     * @param file - The file object (expects .path and .type for images).
+     * @param visibility - 'public' or other (sets ACL accordingly).
+     * @param url - The S3 key (path) where the file will be stored.
+     * @param onSuccess - Optional callback on success.
+     * @param onError - Optional callback on error.
+     */
     public uploadFile({ file, visibility, url, onSuccess, onError }: { file: any, visibility: string, url: string, onSuccess?: Function, onError?: Function }) {
         let response: any;
         let fileContent;
@@ -105,6 +131,12 @@ export class BucketManager {
 
     }
 
+    /**
+     * Deletes a file from the S3 bucket.
+     * @param url - The S3 key (path) of the file to delete.
+     * @param onSuccess - Optional callback on success.
+     * @param onError - Optional callback on error.
+     */
     public deleteFile({ url, onSuccess, onError }: { url: string, onSuccess?: Function, onError?: Function }) {
         this.instance.config.params = {
             Bucket: BucketManager.cfg.s3_bucket

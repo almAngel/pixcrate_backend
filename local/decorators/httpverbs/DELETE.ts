@@ -1,16 +1,22 @@
 import { ContentType } from "../../enum/ContentType";
-import { ServerManager } from "../../helpers/ServerManager";
 import { AbstractController } from "../../controllers/AbstractController";
 import { handledSend } from "../../helpers/Tools";
 import TokenManager from "../../helpers/TokenManager";
 import AuthBridge from "../../helpers/AuthBridge";
-import { v4 as pipRetrieverV4 } from "public-ip";
+import * as publicIp from "public-ip";
 import { GenericDAO } from "../../schemas/dao/GenericDAO";
 import { UserSchema } from "../../schemas/UserSchema";
 import { App } from "../../../bootstrapper";
 import bodyParser = require("body-parser");
 import formidable from "express-formidable";
 
+/**
+ * DELETE HTTP verb decorator for REST controllers.
+ * @param path - The route path for the DELETE endpoint.
+ * @param produces - The content type produced by the endpoint (default: text/plain).
+ * @param consumes - The content type consumed by the endpoint (default: text/plain).
+ * @param sealed - If true, the endpoint requires authentication via px-token header.
+ */
 export function DELETE({ path, produces = ContentType.TEXT_PLAIN, consumes = ContentType.TEXT_PLAIN, sealed = false }: { path: string; produces?: ContentType; consumes?: ContentType; sealed?: boolean }) {
     //Initialize variables
     let originalMethod: Function;
@@ -20,6 +26,7 @@ export function DELETE({ path, produces = ContentType.TEXT_PLAIN, consumes = Con
     let genericDAO: GenericDAO<UserSchema>;
 
     let doDummy = async (req: any, res: any, next: any) => {
+        // Handles authentication, sets headers, and prepares metadata for the controller method.
         //Response reset
         response = "";
 
@@ -48,13 +55,14 @@ export function DELETE({ path, produces = ContentType.TEXT_PLAIN, consumes = Con
 
                     }
                 } catch (e) {
-                    if (e.message == "invalid signature") {
+                    // Type assertion to access 'message' property safely
+                    if ((e as Error).message == "invalid signature") {
                         response = {
                             msg: "Error: Malformed access token",
                             status: 400
                         }
                     } else {
-                        bridge = new AuthBridge(await pipRetrieverV4(), token);
+                        bridge = new AuthBridge(await publicIp.publicIp(), token);
                         response = await bridge.response;
                     }
                 }
@@ -79,6 +87,7 @@ export function DELETE({ path, produces = ContentType.TEXT_PLAIN, consumes = Con
     }
 
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor): any {
+        // Wraps the original method to register the DELETE route and handle request processing.
         originalMethod = descriptor.value;
 
         descriptor.value = function (...args: any[]) {

@@ -4,7 +4,15 @@ import { DatabaseManager } from "../../helpers/DatabaseManager";
 import { MongoError, ObjectId, ObjectID } from "mongodb";
 import IGenericDAO from "./IGenericDAO";
 
-export class GenericDAO<T extends GenericSchema> implements IGenericDAO {
+// GenericDAO provides a generic implementation of data access operations for any schema type.
+// It is used to perform CRUD operations on database documents in a reusable way.
+
+/**
+ * GenericDAO<T> implements generic data access methods for schema T.
+ * Use this class to interact with the database for any entity type.
+ * @template T - The schema type for the DAO.
+ */
+export class GenericDAO<T extends GenericSchema> implements IGenericDAO<T> {
 
     private type: new () => T;
     private static model: Model<Document>;
@@ -91,7 +99,7 @@ export class GenericDAO<T extends GenericSchema> implements IGenericDAO {
 
         return finalResponse;
     }
-    public async saveOrUpdate({ body, id, returnResult }: { body: Object, id?: string, returnResult?: boolean }): Promise<any> {
+    public async saveOrUpdate({ body, id, returnResult }: { body: T, id?: string, returnResult?: boolean }): Promise<any> {
         let finalResponse: any;
         let databaseResponse: any;
         let databaseManager: DatabaseManager;
@@ -147,11 +155,11 @@ export class GenericDAO<T extends GenericSchema> implements IGenericDAO {
                     }
                 }
             } catch (e) {
-                if (e.code == 11000) {
+                if ((e as any).code == 11000) {
                     finalResponse = {
                         msg: `Error: Documents of type ${this.type.name.replace("Schema", "")} couldn't be inserted`,
                         cause: "Data from one or more fields marked as unique collided with request body",
-                        causeCode: e.code,
+                        causeCode: (e as any).code,
                         status: 409
                     }
                 }
